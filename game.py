@@ -79,6 +79,8 @@ def hex_grid(size, nrows, ncols):
 
 size = 100
 hex_list = hex_grid(size, 41, 85)
+redraw = True
+mouse_last = (0, 0)
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -88,10 +90,12 @@ while running:
                 # Scroll up
                 if size < 200:
                     size += 10
+                    redraw = True
             elif event.y < 0:
                 # Scroll down
                 if size > 10:
                     size -= 10
+                    redraw = True
     
     # 0 - Left click
     # 1 - Middle click
@@ -104,11 +108,17 @@ while running:
         screen_center[0] += x
         screen_center[1] += y
 
-    screen.fill("white")
-
-    # Render game
     mouse_pos = pygame.mouse.get_pos()
-    render_grid(screen, size, hex_list, mouse_pos)
+    if mouse_pos != mouse_last:
+        mouse_last = mouse_pos
+        redraw = True
+
+    if redraw:
+        # Render game
+        screen.fill("white")
+        render_grid(screen, size, hex_list, mouse_pos)
+        pygame.display.flip()
+        redraw = False
 
     """
     keys = pygame.key.get_pressed()
@@ -121,8 +131,6 @@ while running:
     if keys[pygame.K_d]:
         player_pos.x += 300 * dt
     """
-
-    pygame.display.flip()
 
     # Limit game to 60 fps
     dt = clock.tick(60) / 1000
